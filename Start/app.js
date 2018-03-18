@@ -20,6 +20,7 @@
             $('#filter-table').click(filterTable);
             $('#sort-table').click(sortTable);
             $('#create-chart').click(createChart);
+            $('#freeze-header').click(freezeHeader);
         });
     };
 
@@ -122,6 +123,23 @@
             chart.dataLabels.format.font.color = "black";
             chart.series.getItemAt(0).name = 'Value in €';
 
+            return context.sync();
+        })
+        .catch(function (error) {
+            console.log("Error: " + error);
+            if (error instanceof OfficeExtension.Error) {
+                console.log("Debug info: " + JSON.stringify(error.debugInfo));
+            }
+        });
+    }
+
+    function freezeHeader() {
+        Excel.run(function (context) {
+    
+            // Queue commands to keep the header visible when the user scrolls.
+            const currentWorksheet = context.workbook.worksheets.getActiveWorksheet();
+            currentWorksheet.freezePanes.freezeRows(1);
+    
             return context.sync();
         })
         .catch(function (error) {
