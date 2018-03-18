@@ -15,4 +15,33 @@
 })();
 
 
-  // Add any ui-less function here
+// Add any ui-less function here
+function toggleProtection(args) {
+  Excel.run(function (context) {
+
+      // Queue commands to reverse the protection status of the current worksheet.
+      const sheet = context.workbook.worksheets.getActiveWorksheet();
+
+      // Queue command to load the sheet's "protection.protected" property from
+      // the document and re-synchronize teh document and task pane.
+      sheet.load('protection/protected');
+      return context.sync()
+        .then(
+          function() {
+            if (sheet.protection.protected) {
+              sheet.protection.unprotect();
+            } else {
+              sheet.protection.protect();
+            }
+          }
+        )
+        .then(context.sync);
+  })
+  .catch(function (error) {
+      console.log("Error: " + error);
+      if (error instanceof OfficeExtension.Error) {
+          console.log("Debug info: " + JSON.stringify(error.debugInfo));
+      }
+  });
+  args.completed();
+}
